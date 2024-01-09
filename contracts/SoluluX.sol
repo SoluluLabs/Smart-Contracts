@@ -26,11 +26,11 @@ contract MyToken is Initializable, ERC721Upgradeable, ERC721EnumerableUpgradeabl
         __UUPSUpgradeable_init();
     }
 
-    function safeMint(address to, string memory uri, uint256 royaltyPercentage) public payable {
+    function safeMint(string memory uri, uint256 royaltyPercentage) public payable {
         require(msg.value >= 5 ether, "Insufficient minting fee");
         require(royaltyPercentage <= 1000, "Max royalty percentage is 10%");
         uint256 tokenId = _nextTokenId++;
-        _safeMint(to, tokenId);
+        _safeMint(msg.sender, tokenId);
         _setTokenURI(tokenId, uri);
         if royaltyPercentage > 0 {
             _setTokenRoyalty(tokenId, msg.sender, royaltyPercentage);
