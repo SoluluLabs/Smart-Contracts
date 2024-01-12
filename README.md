@@ -26,3 +26,16 @@ if contract is not getting verified automatically then -
 ```shell
 npx hardhat verify 0x37CCf694ec49e707377e44fEbd06A53215cD161a --network testnet
 ```
+
+
+test contract
+
+run hardhat node
+```shell
+npx hardhat node
+```
+
+run test command
+```shell
+npx hardhat test --network localhost
+```
