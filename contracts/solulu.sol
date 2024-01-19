@@ -49,7 +49,10 @@ contract SoluluAI is
     /// @notice kecids
     mapping (uint256 => bytes32) public kecId;
 
-    event Minted(address indexed to, uint256 indexed tokenId, uint256 amount, bytes32 kecId);
+    /// @notice kecid map
+    mapping (bytes32 => bool) private isKecIdUsed;
+
+    event Minted(address indexed to, uint256 indexed tokenId, uint256 amount, bytes32 kecId, string characterId, uint256 royaltyPercentage); 
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -95,14 +98,16 @@ contract SoluluAI is
 
     function _processMint( uint256 _amount, uint96 royaltyPercentage, string memory characterId) internal {
         address sender = _msgSenderERC721A();
+        bytes32 _kecId = keccak256(abi.encodePacked(sender, characterId));
+        require(!isKecIdUsed[_kecId], "kecId Minted");
         uint256 tokenId = totalSupply()+1;
+        _mint(sender, _amount);
         if (royaltyPercentage > 0) {
             _setTokenRoyalty(tokenId, sender, royaltyPercentage);
         }
-        bytes32 _kecId = keccak256(abi.encodePacked(sender, characterId));
+        isKecIdUsed[_kecId] = true;
         kecId[tokenId] = _kecId;
-        _mint(sender, _amount);
-        emit Minted(sender, tokenId, _amount, _kecId);
+        emit Minted(sender, tokenId, _amount, _kecId, characterId, royaltyPercentage);
     }
 
     function setApprovalForAll(
@@ -291,19 +296,6 @@ contract SoluluAI is
         require(success, "Unable to withdraw ETH");
     }
 
-    
-    /**
-     * @dev Airdrop function
-     * @param _to The addresses to mint to airdrop too
-     */
-    function airdrop(address[] calldata _to) external onlyOwner {
-        for (uint256 i = 0; i < _to.length; ) {
-            _mint(_to[i], 1);
-            unchecked {
-                ++i;
-            }
-        }
-    }
 
     /**
      * @notice Sets whether the operator filter is enabled or disabled

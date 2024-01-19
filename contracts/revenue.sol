@@ -18,11 +18,11 @@ contract SoluluReward is Initializable, OwnableUpgradeable {
 
     address public soluluTokenAddress;
 
-    event RewardUpdated(address[] indexed _address, uint256[] _value);
+    event RewardUpdated(address indexed _address, uint256 _value);
 
     event RewardClaimed(address indexed _address, uint256 _value);
 
-    event Deposit(address indexed _tokenAddress, address indexed _address, uint256 _value);
+    event Deposited(address indexed _tokenAddress, address indexed _address, uint256 _value);
 
     event Withdraw(address indexed _tokenAddress, address indexed _address, uint256 _value);
 
@@ -30,7 +30,7 @@ contract SoluluReward is Initializable, OwnableUpgradeable {
 
     event TokenAddressUpdated(address indexed _address);
 
-    event TokenAddressApproved(address[] indexed _address, bool[] _value);
+    event TokenAddressApproved(address indexed _address, bool _value);
 
     event WithdrawETH(address indexed _address, uint256 _value);
 
@@ -61,7 +61,7 @@ contract SoluluReward is Initializable, OwnableUpgradeable {
                 _amount
             );
         }
-        emit Deposit(_tokenAddress, msg.sender, _amount);
+        emit Deposited(_tokenAddress, msg.sender, _amount);  
     }
 
     /**
@@ -73,8 +73,8 @@ contract SoluluReward is Initializable, OwnableUpgradeable {
         require(_tokenAddresses.length == _values.length, "Arrays length mismatch");
         for (uint256 i = 0; i < _tokenAddresses.length; i++) {
             isApprovedTokenAddress[_tokenAddresses[i]] = _values[i];
+            emit TokenAddressApproved(_tokenAddresses[i], _values[i]);
         }
-        emit TokenAddressApproved(_tokenAddresses, _values);
     }
 
     /**
@@ -138,7 +138,7 @@ contract SoluluReward is Initializable, OwnableUpgradeable {
         require(_addresses.length == values.length, "Arrays length mismatch");
         for (uint256 i = 0; i < _addresses.length; i++) {
             reward[_addresses[i]] += values[i] * 1 ether;
+            emit RewardUpdated(_addresses[i], values[i]);
         }
-        emit RewardUpdated(_addresses, values);
     }
 }

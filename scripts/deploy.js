@@ -4,24 +4,23 @@
 // You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
 // will compile your contracts, add the Hardhat Runtime Environment's members to the
 // global scope, and execute the script.
-const hre = require("hardhat");
+const { ethers, run } = require("hardhat");
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
 
-  const lockedAmount = hre.ethers.parseEther("0.001");
+  const Token = await ethers.getContractFactory("VirtualUSDT");
+  console.log("Deploying VirtualUSDT...");
+  const token = await ethers.deployContract(Token, ["Virtual USDT", "vUSDT", 45]);
+  console.log("VirtualUSDT deployed to:", token.address);
+  await token.deployed();
 
-  const lock = await hre.ethers.deployContract("Lock", [unlockTime], {
-    value: lockedAmount,
+  console.log('Waiting for 30 sec to get the transaction mined...');
+  await new Promise(resolve => setTimeout(resolve, 30000));
+  await run('verify', {
+    address: token.address,
   });
 
-  await lock.waitForDeployment();
-
-  console.log(
-    `Lock with ${ethers.formatEther(
-      lockedAmount
-    )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.target}`
+  console.log("VirtualUSDT deployed to:", token.address
   );
 }
 
